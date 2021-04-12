@@ -92,7 +92,7 @@ def streaming_pipeline(project, region="us-central1"):
             timestampStr = dateTimeObj.strftime("%m-%d-%Y-%H:%M")
             file_prefix = "Pet_Created_Output_" + timestampStr + '.json' 
             writer = FileSystems.create(self.outdir + file_prefix, 'text/plain')
-            writer.write(element.encode())
+            writer.write(element[0].encode())
             writer.close()
 
     subscription = "projects/furlong-platform-sbx-8d14f3/subscriptions/Pet_Created"
