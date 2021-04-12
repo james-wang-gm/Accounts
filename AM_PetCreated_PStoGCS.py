@@ -73,9 +73,12 @@ def streaming_pipeline(project, region="us-central1"):
             import time
             from datetime import datetime
             from apache_beam.io.filesystems import FileSystems
-            x = json.loads(element)
+            x = json.loads(element.decode("utf8"))
             x = pd.json_normalize(x, max_level = 0)
             x = x.to_dict('r')
+        
+            result = [json.dumps(record) for record in x]  # the only significant line to convert the JSON to the desired format
+            x = ('\n'.join(result))
             
             return [x]
     
@@ -92,7 +95,7 @@ def streaming_pipeline(project, region="us-central1"):
             timestampStr = dateTimeObj.strftime("%m-%d-%Y-%H:%M")
             file_prefix = "Pet_Created_Output_" + timestampStr + '.json' 
             writer = FileSystems.create(self.outdir + file_prefix, 'text/plain')
-            writer.write(element)
+            writer.write(element.encode())
             writer.close()
 
     subscription = "projects/furlong-platform-sbx-8d14f3/subscriptions/Pet_Created"
@@ -100,7 +103,7 @@ def streaming_pipeline(project, region="us-central1"):
     bucket = "gs://dev-analytics-data-lake/Accounts/PetCreated/"
 
     lines = (p | "Read Topic" >> ReadFromPubSub(subscription = subscription)
-            #| "Normalize into DF" >> beam.ParDo(normalize())
+            | "Normalize into DF" >> beam.ParDo(normalize())
             | "WriteOutput" >> beam.ParDo(WriteToGCS())
             )
 
