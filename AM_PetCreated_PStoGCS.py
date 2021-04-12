@@ -100,7 +100,7 @@ def streaming_pipeline(project, region="us-central1"):
     bucket = "gs://dev-analytics-data-lake/Accounts/PetCreated/"
 
     lines = (p | "Read Topic" >> ReadFromPubSub(subscription = subscription)
-            | "Normalize into DF" >> beam.ParDo(normalize())
+            #| "Normalize into DF" >> beam.ParDo(normalize())
             | "WriteOutput" >> beam.ParDo(WriteToGCS())
             )
 
