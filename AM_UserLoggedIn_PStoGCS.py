@@ -77,11 +77,11 @@ def streaming_pipeline(project, region="us-central1"):
             x = pd.json_normalize(x, max_level = 0)
             x = x.to_dict('r')
             
-            shopify_key_1 = list(x[0]['data'].keys())
+            shopify_key_1 = list(x[0]['data']['user'].keys())
             #data level
             for key in shopify_key_1:
                 if key in ['email','firstName','lastName']:
-                    del x[0]['data'][key]
+                    del x[0]['data']['user'][key]
         
             result = [json.dumps(record) for record in x]  # the only significant line to convert the JSON to the desired format
             x = ('\n'.join(result))
