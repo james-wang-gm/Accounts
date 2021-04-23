@@ -58,7 +58,7 @@ def streaming_pipeline(project, region="us-central1"):
         # Make sure staging and temp folder are created using cloud commands
         staging_location="gs://prd-analytics-temp-files/staging",
         temp_location='gs://prd-analytics-temp-files/temp',
-        template_location = 'gs://dev-analytics-temp-files/Accounts/AM_UserCreated_PStoGCS.py',
+        template_location = 'gs://prd-analytics-temp-files/Accounts/AM_UserCreated_PStoGCS.py',
         autoscaling_algorithm = 'THROUGHPUT_BASED',
         max_num_workers = 5
     )
