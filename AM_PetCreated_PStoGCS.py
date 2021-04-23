@@ -73,7 +73,7 @@ def streaming_pipeline(project, region="us-central1"):
             import time
             from datetime import datetime
             from apache_beam.io.filesystems import FileSystems
-            x = json.loads(element.decode("utf8"))
+            x = json.loads(element.decode("utf8"),strict=False)
             x = pd.json_normalize(x, max_level = 0)
             x = x.to_dict('r')
         
