@@ -37,29 +37,29 @@ class CustomPipelineOptions(PipelineOptions):
             '--path',
             type=str,
             help='Path of the file to read from',
-            default = 'dev-analytics-data-lake/Accounts/UserUpdated/UserUpdated_testing.json')
+            default = 'prd-analytics-data-lake/Accounts/UserUpdated/UserUpdated_testing.json')
         parser.add_value_provider_argument(
             '--output',
             type=str,
             help='Output file if needed')
 
-project = 'furlong-platform-sbx-8d14f3'
+project = 'furlong-platform-prd-07cbc1'
 
 #Pipeline Logic
 def streaming_pipeline(project, region="us-central1"):
     
-    subscription = "projects/furlong-platform-sbx-8d14f3/subscriptions/User_Updated"
-    bucket = "gs://dev-analytics-data-lake/Accounts/UserUpdated/"
-    project = 'furlong-platform-sbx-8d14f3'
+    subscription = "projects/furlong-platform-prd-07cbc1/subscriptions/User_Updated"
+    bucket = "gs://prd-analytics-data-lake/Accounts/UserUpdated/"
+    project = 'furlong-platform-prd-07cbc1'
     
     options = PipelineOptions(
         streaming=True,
         project=project,
         region=region,
         # Make sure staging and temp folder are created using cloud commands
-        staging_location="gs://dev-analytics-temp-files/staging",
-        temp_location='gs://dev-analytics-temp-files/temp', 
-        template_location = 'gs://dev-analytics-temp-files/Accounts/AM_UserUpdated_PStoGCS.py',
+        staging_location="gs://prd-analytics-temp-files/staging",
+        temp_location='gs://prd-analytics-temp-files/temp', 
+        template_location = 'gs://prd-analytics-temp-files/Accounts/AM_UserUpdated_PStoGCS.py',
         autoscaling_algorithm = 'THROUGHPUT_BASED',
         max_num_workers = 5
     )
@@ -103,7 +103,7 @@ def streaming_pipeline(project, region="us-central1"):
     
     class WriteToGCS(beam.DoFn):
         def __init__(self):
-            self.outdir = "gs://dev-analytics-data-lake/Accounts/UserUpdated/"
+            self.outdir = "gs://prd-analytics-data-lake/Accounts/UserUpdated/"
 
         def process(self, element):
             import json
@@ -117,9 +117,9 @@ def streaming_pipeline(project, region="us-central1"):
             writer.write(element.encode())
             writer.close()
 
-    subscription = "projects/furlong-platform-sbx-8d14f3/subscriptions/User_Updated"
-    topic = "projects/furlong-platform-sbx-8d14f3/topics/user-updated"
-    bucket = "gs://dev-analytics-data-lake/Accounts/UserUpdated/"
+    subscription = "projects/furlong-platform-prd-07cbc1/subscriptions/User_Updated"
+    topic = "projects/furlong-platform-prd-07cbc1/topics/user-updated"
+    bucket = "gs://prd-analytics-data-lake/Accounts/UserUpdated/"
 
     lines = (p | "Read Topic" >> ReadFromPubSub(subscription = subscription)
             | "Normalize into DF" >> beam.ParDo(normalize())

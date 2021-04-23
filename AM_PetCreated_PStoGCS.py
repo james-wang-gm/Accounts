@@ -37,28 +37,28 @@ class CustomPipelineOptions(PipelineOptions):
             '--path',
             type=str,
             help='Path of the file to read from',
-            default = 'dev-analytics-data-lake/Accounts/PetCreated/PetCreated_testing.json')
+            default = 'prd-analytics-data-lake/Accounts/PetCreated/PetCreated_testing.json')
         parser.add_value_provider_argument(
             '--output',
             type=str,
             help='Output file if needed')
 
-project = 'furlong-platform-sbx-8d14f3'
+project = 'furlong-platform-prd-07cbc1'
 
 #Pipeline Logic
 def streaming_pipeline(project, region="us-central1"):
     
-    subscription = "projects/furlong-platform-sbx-8d14f3/subscriptions/Pet_Created"
-    bucket = "gs://dev-analytics-data-lake/Accounts/Pet_Created/"
+    subscription = "projects/furlong-platform-prd-07cbc1/subscriptions/Pet_Created"
+    bucket = "gs://prd-analytics-data-lake/Accounts/Pet_Created/"
     
     options = PipelineOptions(
         streaming=True,
         project=project,
         region=region,
         # Make sure staging and temp folder are created using cloud commands
-        staging_location="gs://dev-analytics-temp-files/staging",
-        temp_location='gs://dev-analytics-temp-files/temp',
-        template_location = 'gs://dev-analytics-temp-files/Accounts/AM_PetCreated_PStoGCS.py',
+        staging_location="gs://prd-analytics-temp-files/staging",
+        temp_location='gs://prd-analytics-temp-files/temp',
+        template_location = 'gs://prd-analytics-temp-files/Accounts/AM_PetCreated_PStoGCS.py',
         autoscaling_algorithm = 'THROUGHPUT_BASED',
         max_num_workers = 5
     )
@@ -73,7 +73,7 @@ def streaming_pipeline(project, region="us-central1"):
             import time
             from datetime import datetime
             from apache_beam.io.filesystems import FileSystems
-            x = json.loads(element.decode("utf8"),strict=False)
+            x = json.loads(element.decode("utf8"))
             x = pd.json_normalize(x, max_level = 0)
             x = x.to_dict('r')
         
@@ -84,7 +84,7 @@ def streaming_pipeline(project, region="us-central1"):
     
     class WriteToGCS(beam.DoFn):
         def __init__(self):
-            self.outdir = "gs://dev-analytics-data-lake/Accounts/PetCreated/"
+            self.outdir = "gs://prd-analytics-data-lake/Accounts/PetCreated/"
 
         def process(self, element):
             import json
@@ -98,9 +98,9 @@ def streaming_pipeline(project, region="us-central1"):
             writer.write(element.encode())
             writer.close()
 
-    subscription = "projects/furlong-platform-sbx-8d14f3/subscriptions/Pet_Created"
-    topic = "projects/furlong-platform-sbx-8d14f3/topics/pet-created"
-    bucket = "gs://dev-analytics-data-lake/Accounts/PetCreated/"
+    subscription = "projects/furlong-platform-prd-07cbc1/subscriptions/Pet_Created"
+    topic = "projects/furlong-platform-prd-07cbc1/topics/pet-created"
+    bucket = "gs://prd-analytics-data-lake/Accounts/PetCreated/"
 
     lines = (p | "Read Topic" >> ReadFromPubSub(subscription = subscription)
             | "Normalize into DF" >> beam.ParDo(normalize())
