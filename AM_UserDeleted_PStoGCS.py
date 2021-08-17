@@ -88,24 +88,6 @@ def streaming_pipeline(project, region="us-central1"):
             x = json.loads(element.decode("utf8"))
             x = pd.json_normalize(x, max_level = 0)
             x = x.to_dict('r')
-            
-            shopify_key_1 = list(x[0]['data']['user'].keys())
-            #data level
-            for key in shopify_key_1:
-                if key in ['email','firstName','lastName','preferredName']:
-                    del x[0]['data']['user'][key]
-
-            shopify_key_2 = list(x[0]['data']['user']['address'].keys())
-            #data level
-            for key in shopify_key_2:
-                if key in ['addressLine1']:
-                    del x[0]['data']['user']['address'][key]
-            
-            shopify_key_3 = list(x[0]['data']['user']['household'].keys())
-            #data level
-            for key in shopify_key_3:
-                if key in ['name']:
-                    del x[0]['data']['user']['household'][key]
         
             result = [json.dumps(record) for record in x]  # the only significant line to convert the JSON to the desired format
             x = ('\n'.join(result))
